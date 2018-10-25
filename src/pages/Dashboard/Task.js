@@ -35,34 +35,8 @@ const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
-const statusMap = ['default', 'processing', 'success', 'error'];
-const status = ['关闭', '运行中', '已上线', '异常'];
-
-const CreateForm = Form.create()(props => {
-  const { modalVisible, form, handleAdd, handleModalVisible } = props;
-  const okHandle = () => {
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      form.resetFields();
-      handleAdd(fieldsValue);
-    });
-  };
-  return (
-    <Modal
-      destroyOnClose
-      title="新建规则"
-      visible={modalVisible}
-      onOk={okHandle}
-      onCancel={() => handleModalVisible()}
-    >
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="描述">
-        {form.getFieldDecorator('desc', {
-          rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
-        })(<Input placeholder="请输入" />)}
-      </FormItem>
-    </Modal>
-  );
-});
+const versionMap = ['default', 'processing'];
+const version = ['MOCK版本', '服务版本'];
 
 @Form.create()
 class UpdateForm extends PureComponent {
@@ -71,15 +45,48 @@ class UpdateForm extends PureComponent {
 
     this.state = {
       formVals: {
-        name: props.values.name,
-        desc: props.values.desc,
+        ipAddress: props.values.ipAddress,
+        confPath: props.values.confPath,
         key: props.values.key,
-        target: '0',
-        template: '0',
-        type: '1',
-        time: '',
-        frequency: 'month',
-      },
+      }
+    }
+  }
+  render() {
+    const { form, handleUpdate,updateModalVisible,handleUpdateModalVisible } = this.props;
+    const { formVals } = this.state;
+    console.log(formVals)
+    const okHandle = () => {
+      form.validateFields((err, fieldsValue) => {
+        if (err) return;
+        form.resetFields();
+        handleUpdate(fieldsValue);
+      });
+    };
+    return (
+      <Modal
+        destroyOnClose
+        title="更新任务"
+        visible={updateModalVisible}
+        onOk={okHandle}
+        onCancel={() => handleUpdateModalVisible()}
+      >
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="IP地址">
+          {form.getFieldDecorator('ipAddress', {
+            jobs: [{ required: true, message: '请输入ip地址！', min: 5 }],
+            initialValue: formVals.ipAddress,
+          })(<Input placeholder="请输入1" />)}
+        </FormItem>
+      </Modal>
+    );
+  }
+}
+
+@Form.create()
+class CreateForm extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       currentStep: 0,
     };
 
@@ -90,7 +97,9 @@ class UpdateForm extends PureComponent {
   }
 
   handleNext = currentStep => {
-    const { form, handleUpdate } = this.props;
+    //console.log(this.props)
+    //console.log(this.state)
+    const { form, handleAdd } = this.props;
     const { formVals: oldValue } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -103,7 +112,8 @@ class UpdateForm extends PureComponent {
           if (currentStep < 2) {
             this.forward();
           } else {
-            handleUpdate(formVals);
+            //console.log(formVals)
+            handleAdd(formVals);
           }
         }
       );
@@ -124,37 +134,25 @@ class UpdateForm extends PureComponent {
     });
   };
 
-  renderContent = (currentStep, formVals) => {
+  renderContent = (currentStep) => {
     const { form } = this.props;
     if (currentStep === 1) {
       return [
-        <FormItem key="target" {...this.formLayout} label="监控对象">
-          {form.getFieldDecorator('target', {
-            initialValue: formVals.target,
+        <FormItem key="version" {...this.formLayout} label="接口版本">
+          {form.getFieldDecorator('version', {
           })(
             <Select style={{ width: '100%' }}>
-              <Option value="0">表一</Option>
-              <Option value="1">表二</Option>
+              <Option value="0">MOCK版本</Option>
+              <Option value="1">服务版本</Option>
             </Select>
           )}
         </FormItem>,
-        <FormItem key="template" {...this.formLayout} label="规则模板">
-          {form.getFieldDecorator('template', {
-            initialValue: formVals.template,
-          })(
-            <Select style={{ width: '100%' }}>
-              <Option value="0">规则模板一</Option>
-              <Option value="1">规则模板二</Option>
-            </Select>
-          )}
-        </FormItem>,
-        <FormItem key="type" {...this.formLayout} label="规则类型">
+        <FormItem key="type" {...this.formLayout} label="立即生效">
           {form.getFieldDecorator('type', {
-            initialValue: formVals.type,
           })(
             <RadioGroup>
-              <Radio value="0">强</Radio>
-              <Radio value="1">弱</Radio>
+              <Radio value="0">否</Radio>
+              <Radio value="1">是</Radio>
             </RadioGroup>
           )}
         </FormItem>,
@@ -164,7 +162,7 @@ class UpdateForm extends PureComponent {
       return [
         <FormItem key="time" {...this.formLayout} label="开始时间">
           {form.getFieldDecorator('time', {
-            rules: [{ required: true, message: '请选择开始时间！' }],
+            jobs: [{ required: true, message: '请选择开始时间！' }],
           })(
             <DatePicker
               style={{ width: '100%' }}
@@ -176,7 +174,6 @@ class UpdateForm extends PureComponent {
         </FormItem>,
         <FormItem key="frequency" {...this.formLayout} label="调度周期">
           {form.getFieldDecorator('frequency', {
-            initialValue: formVals.frequency,
           })(
             <Select style={{ width: '100%' }}>
               <Option value="month">月</Option>
@@ -187,29 +184,27 @@ class UpdateForm extends PureComponent {
       ];
     }
     return [
-      <FormItem key="name" {...this.formLayout} label="规则名称">
-        {form.getFieldDecorator('name', {
-          rules: [{ required: true, message: '请输入规则名称！' }],
-          initialValue: formVals.name,
+      <FormItem key="ipAddress" {...this.formLayout} label="服务器IP">
+        {form.getFieldDecorator('ipAddress', {
+          jobs: [{ required: true, message: '请输入服务器IP！' }],
         })(<Input placeholder="请输入" />)}
       </FormItem>,
-      <FormItem key="desc" {...this.formLayout} label="规则描述">
-        {form.getFieldDecorator('desc', {
-          rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
-          initialValue: formVals.desc,
-        })(<TextArea rows={4} placeholder="请输入至少五个字符" />)}
+      <FormItem key="confPath" {...this.formLayout} label="配置文件路径">
+        {form.getFieldDecorator('confPath', {
+          jobs: [{ required: true, message: '请输入配置文件路径！', min: 5 }],
+        })(<TextArea rows={4} placeholder="请输入有效路径" />)}
       </FormItem>,
     ];
   };
 
   renderFooter = currentStep => {
-    const { handleUpdateModalVisible } = this.props;
+    const { handleModalVisible } = this.props;
     if (currentStep === 1) {
       return [
         <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
           上一步
         </Button>,
-        <Button key="cancel" onClick={() => handleUpdateModalVisible()}>
+        <Button key="cancel" onClick={() => handleModalVisible()}>
           取消
         </Button>,
         <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -222,7 +217,7 @@ class UpdateForm extends PureComponent {
         <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
           上一步
         </Button>,
-        <Button key="cancel" onClick={() => handleUpdateModalVisible()}>
+        <Button key="cancel" onClick={() => handleModalVisible()}>
           取消
         </Button>,
         <Button key="submit" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -231,7 +226,7 @@ class UpdateForm extends PureComponent {
       ];
     }
     return [
-      <Button key="cancel" onClick={() => handleUpdateModalVisible()}>
+      <Button key="cancel" onClick={() => handleModalVisible()}>
         取消
       </Button>,
       <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -241,34 +236,35 @@ class UpdateForm extends PureComponent {
   };
 
   render() {
-    const { updateModalVisible, handleUpdateModalVisible } = this.props;
-    const { currentStep, formVals } = this.state;
-
+    const { modalVisible, handleModalVisible } = this.props;
+    const { currentStep } = this.state;
+    //console.log(this.props)
+    //console.log(this.state)
     return (
       <Modal
         width={640}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
-        title="规则配置"
-        visible={updateModalVisible}
+        title="接口配置"
+        visible={modalVisible}
         footer={this.renderFooter(currentStep)}
-        onCancel={() => handleUpdateModalVisible()}
+        onCancel={() => handleModalVisible()}
       >
         <Steps style={{ marginBottom: 28 }} size="small" current={currentStep}>
           <Step title="基本信息" />
-          <Step title="配置规则属性" />
+          <Step title="版本信息" />
           <Step title="设定调度周期" />
         </Steps>
-        {this.renderContent(currentStep, formVals)}
+        {this.renderContent(currentStep)}
       </Modal>
     );
   }
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ rule, loading }) => ({
-  rule,
-  loading: loading.models.rule,
+@connect(({ job, loading }) => ({
+  job,
+  loading: loading.models.job,
 }))
 @Form.create()
 class Task extends PureComponent {
@@ -283,49 +279,41 @@ class Task extends PureComponent {
 
   columns = [
     {
-      title: '规则名称',
-      dataIndex: 'name',
+      title: '服务器IP',
+      dataIndex: 'ipAddress',
     },
     {
-      title: '描述',
-      dataIndex: 'desc',
+      title: '配置路径',
+      dataIndex: 'confPath',
     },
     {
-      title: '服务调用次数',
-      dataIndex: 'callNo',
+      title: '调用次数',
+      dataIndex: 'number',
       sorter: true,
       align: 'right',
-      render: val => `${val} 万`,
+      render: val => `${val}`,
       // mark to display a total number
       needTotal: true,
     },
     {
-      title: '状态',
-      dataIndex: 'status',
+      title: '接口版本',
+      dataIndex: 'version',
       filters: [
         {
-          text: status[0],
+          text: version[0],
           value: 0,
         },
         {
-          text: status[1],
+          text: version[1],
           value: 1,
-        },
-        {
-          text: status[2],
-          value: 2,
-        },
-        {
-          text: status[3],
-          value: 3,
         },
       ],
       render(val) {
-        return <Badge status={statusMap[val]} text={status[val]} />;
+        return <Badge status={versionMap[val]} text={version[val]} />;
       },
     },
     {
-      title: '上次调度时间',
+      title: '最近更新时间',
       dataIndex: 'updatedAt',
       sorter: true,
       render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
@@ -334,9 +322,9 @@ class Task extends PureComponent {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
+          <a onClick={() => this.handleUpdateModalVisible(true, record)}>编辑</a>
           <Divider type="vertical" />
-          <a href="">订阅警报</a>
+          <a href="">详情</a>
         </Fragment>
       ),
     },
@@ -345,7 +333,7 @@ class Task extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'rule/fetch',
+      type: 'job/fetch',
     });
   }
 
@@ -370,7 +358,7 @@ class Task extends PureComponent {
     }
 
     dispatch({
-      type: 'rule/fetch',
+      type: 'job/fetch',
       payload: params,
     });
   };
@@ -382,7 +370,7 @@ class Task extends PureComponent {
       formValues: {},
     });
     dispatch({
-      type: 'rule/fetch',
+      type: 'job/fetch',
       payload: {},
     });
   };
@@ -402,7 +390,7 @@ class Task extends PureComponent {
     switch (e.key) {
       case 'remove':
         dispatch({
-          type: 'rule/remove',
+          type: 'job/remove',
           payload: {
             key: selectedRows.map(row => row.key),
           },
@@ -442,18 +430,18 @@ class Task extends PureComponent {
       });
 
       dispatch({
-        type: 'rule/fetch',
+        type: 'job/fetch',
         payload: values,
       });
     });
   };
 
-  handleModalVisible = flag => {
+  handleModalVisible = (flag) => {
     this.setState({
-      modalVisible: !!flag,
+      modalVisible: !!flag
     });
-  };
 
+  };
   handleUpdateModalVisible = (flag, record) => {
     this.setState({
       updateModalVisible: !!flag,
@@ -464,12 +452,11 @@ class Task extends PureComponent {
   handleAdd = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'rule/add',
+      type: 'job/add',
       payload: {
-        desc: fields.desc,
+        ipAddress: fields.ipAddress,
       },
     });
-
     message.success('添加成功');
     this.handleModalVisible();
   };
@@ -477,7 +464,7 @@ class Task extends PureComponent {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'rule/update',
+      type: 'job/update',
       payload: {
         name: fields.name,
         desc: fields.desc,
@@ -497,16 +484,16 @@ class Task extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则名称">
+            <FormItem label="服务器IP">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
+            <FormItem label="接口版本">
+              {getFieldDecorator('version')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+                  <Option value="0">MOCK版本</Option>
+                  <Option value="1">服务版本</Option>
                 </Select>
               )}
             </FormItem>
@@ -537,16 +524,33 @@ class Task extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+            <FormItem label="服务器IP">
+              {getFieldDecorator('ipAddress')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
+            <FormItem label="登录账户">
+              {getFieldDecorator('username')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="登录密码">
+              {getFieldDecorator('password')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+        </Row>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="配置路径">
+              {getFieldDecorator('confPath')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="接口版本">
+              {getFieldDecorator('version')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+                  <Option value="0">MOCK</Option>
+                  <Option value="1">REALs</Option>
                 </Select>
               )}
             </FormItem>
@@ -565,26 +569,7 @@ class Task extends PureComponent {
               )}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status3')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status4')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
+
         </Row>
         <div style={{ overflow: 'hidden' }}>
           <div style={{ float: 'right', marginBottom: 24 }}>
@@ -610,7 +595,7 @@ class Task extends PureComponent {
 
   render() {
     const {
-      rule: { data },
+      job: { data },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;

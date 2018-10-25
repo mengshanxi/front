@@ -42,7 +42,43 @@ export async function updateRule(params) {
     },
   });
 }
+//----------
 
+export async function queryJob(params) {
+  return request(`/api/job?${stringify(params)}`);
+}
+
+export async function removeJob(params) {
+  return request('/api/job', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'delete',
+    },
+  });
+}
+
+export async function addJob(params) {
+  console.log(params)
+  return request('/api/job', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function updateJob(params) {
+  return request('/api/job', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'update',
+    },
+  });
+}
+//--------------------
 export async function fakeSubmitForm(params) {
   return request('/api/forms', {
     method: 'POST',
