@@ -45,7 +45,8 @@ export async function updateRule(params) {
 //----------
 
 export async function queryJob(params) {
-  return request(`/api/job?${stringify(params)}`);
+  //return request(`/api/job?${stringify(params)}`);
+  return request(`/api/job`);
 }
 
 export async function removeJob(params) {
@@ -59,7 +60,6 @@ export async function removeJob(params) {
 }
 
 export async function addJob(params) {
-  console.log(params)
   return request('/api/job', {
     method: 'POST',
     body: {
@@ -103,14 +103,10 @@ export async function queryAdvancedProfile() {
 }
 
 export async function queryFakeList(params) {
-  console.log('query params:');
-  console.log(params);
   return request(`/api/fake_list?${stringify(params)}`);
 }
 
 export async function removeFakeList(params) {
-  console.log('remove params:');
-  console.log(params);
   const { count = 5, ...restParams } = params;
   return request(`/api/fake_list?count=${count}`, {
     method: 'POST',
@@ -123,8 +119,6 @@ export async function removeFakeList(params) {
 
 export async function addFakeList(params) {
   const { count = 5, ...restParams } = params;
-  console.log('add params:');
-  console.log(params);
   return request(`/api/fake_list?count=${count}`, {
     method: 'POST',
     body: {

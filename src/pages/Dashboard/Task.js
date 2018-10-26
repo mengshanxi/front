@@ -54,7 +54,7 @@ class UpdateForm extends PureComponent {
   render() {
     const { form, handleUpdate,updateModalVisible,handleUpdateModalVisible } = this.props;
     const { formVals } = this.state;
-    console.log(formVals)
+    //console.log(formVals)
     const okHandle = () => {
       form.validateFields((err, fieldsValue) => {
         if (err) return;
@@ -74,7 +74,7 @@ class UpdateForm extends PureComponent {
           {form.getFieldDecorator('ipAddress', {
             jobs: [{ required: true, message: '请输入ip地址！', min: 5 }],
             initialValue: formVals.ipAddress,
-          })(<Input placeholder="请输入1" />)}
+          })(<Input placeholder="请输入" />)}
         </FormItem>
       </Modal>
     );
@@ -87,6 +87,16 @@ class CreateForm extends PureComponent {
     super(props);
 
     this.state = {
+      formVals: {
+        ipAddress: '',
+        confPath: '',
+        key: '',
+        target: '0',
+        version: '0',
+        type: '1',
+        time: '',
+        frequency: 'month',
+      },
       currentStep: 0,
     };
 
@@ -96,6 +106,7 @@ class CreateForm extends PureComponent {
     };
   }
 
+
   handleNext = currentStep => {
     //console.log(this.props)
     //console.log(this.state)
@@ -104,6 +115,7 @@ class CreateForm extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       const formVals = { ...oldValue, ...fieldsValue };
+      //console.log(formVals)
       this.setState(
         {
           formVals,
@@ -134,12 +146,13 @@ class CreateForm extends PureComponent {
     });
   };
 
-  renderContent = (currentStep) => {
+  renderContent = (currentStep,formVals) => {
     const { form } = this.props;
     if (currentStep === 1) {
       return [
         <FormItem key="version" {...this.formLayout} label="接口版本">
           {form.getFieldDecorator('version', {
+            initialValue: formVals.version,
           })(
             <Select style={{ width: '100%' }}>
               <Option value="0">MOCK版本</Option>
@@ -149,6 +162,7 @@ class CreateForm extends PureComponent {
         </FormItem>,
         <FormItem key="type" {...this.formLayout} label="立即生效">
           {form.getFieldDecorator('type', {
+               initialValue: formVals.type,
           })(
             <RadioGroup>
               <Radio value="0">否</Radio>
@@ -174,6 +188,7 @@ class CreateForm extends PureComponent {
         </FormItem>,
         <FormItem key="frequency" {...this.formLayout} label="调度周期">
           {form.getFieldDecorator('frequency', {
+              initialValue: formVals.frequency,
           })(
             <Select style={{ width: '100%' }}>
               <Option value="month">月</Option>
@@ -186,11 +201,13 @@ class CreateForm extends PureComponent {
     return [
       <FormItem key="ipAddress" {...this.formLayout} label="服务器IP">
         {form.getFieldDecorator('ipAddress', {
+           initialValue: formVals.ipAddress,
           jobs: [{ required: true, message: '请输入服务器IP！' }],
         })(<Input placeholder="请输入" />)}
       </FormItem>,
       <FormItem key="confPath" {...this.formLayout} label="配置文件路径">
         {form.getFieldDecorator('confPath', {
+             initialValue: formVals.confPath,
           jobs: [{ required: true, message: '请输入配置文件路径！', min: 5 }],
         })(<TextArea rows={4} placeholder="请输入有效路径" />)}
       </FormItem>,
@@ -204,7 +221,7 @@ class CreateForm extends PureComponent {
         <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
           上一步
         </Button>,
-        <Button key="cancel" onClick={() => handleModalVisible()}>
+        <Button key="cancel" onClick={() => handleModalVisible(false,0)}>
           取消
         </Button>,
         <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -217,7 +234,7 @@ class CreateForm extends PureComponent {
         <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
           上一步
         </Button>,
-        <Button key="cancel" onClick={() => handleModalVisible()}>
+        <Button key="cancel" onClick={() => handleModalVisible(false,0)}>
           取消
         </Button>,
         <Button key="submit" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -226,7 +243,7 @@ class CreateForm extends PureComponent {
       ];
     }
     return [
-      <Button key="cancel" onClick={() => handleModalVisible()}>
+      <Button key="cancel" onClick={() => handleModalVisible(false,0)}>
         取消
       </Button>,
       <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -237,8 +254,8 @@ class CreateForm extends PureComponent {
 
   render() {
     const { modalVisible, handleModalVisible } = this.props;
-    const { currentStep } = this.state;
-    //console.log(this.props)
+    const { currentStep,formVals } = this.state;
+
     //console.log(this.state)
     return (
       <Modal
@@ -248,14 +265,14 @@ class CreateForm extends PureComponent {
         title="接口配置"
         visible={modalVisible}
         footer={this.renderFooter(currentStep)}
-        onCancel={() => handleModalVisible()}
+        onCancel={() => handleModalVisible(false,0)}
       >
         <Steps style={{ marginBottom: 28 }} size="small" current={currentStep}>
           <Step title="基本信息" />
           <Step title="版本信息" />
           <Step title="设定调度周期" />
         </Steps>
-        {this.renderContent(currentStep)}
+        {this.renderContent(currentStep,formVals)}
       </Modal>
     );
   }
@@ -436,9 +453,10 @@ class Task extends PureComponent {
     });
   };
 
-  handleModalVisible = (flag) => {
+  handleModalVisible = (flag,currentStep)  => {
     this.setState({
-      modalVisible: !!flag
+      modalVisible: !!flag,
+      currentStep:currentStep
     });
 
   };
@@ -458,7 +476,7 @@ class Task extends PureComponent {
       },
     });
     message.success('添加成功');
-    this.handleModalVisible();
+    this.handleModalVisible(false,0);
   };
 
   handleUpdate = fields => {
@@ -620,7 +638,7 @@ class Task extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true,0)}>
                 新建
               </Button>
               {selectedRows.length > 0 && (
