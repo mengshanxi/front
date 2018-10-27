@@ -26,6 +26,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './Task.less';
 
+
 const FormItem = Form.Item;
 const { Step } = Steps;
 const { TextArea } = Input;
@@ -146,8 +147,17 @@ class CreateForm extends PureComponent {
     });
   };
 
+  cancel = ()  => {
+    const { handleModalVisible } = this.props;
+    this.setState({
+      currentStep: 0,
+    });
+    handleModalVisible();
+  };
+
   renderContent = (currentStep,formVals) => {
     const { form } = this.props;
+    
     if (currentStep === 1) {
       return [
         <FormItem key="version" {...this.formLayout} label="接口版本">
@@ -221,7 +231,7 @@ class CreateForm extends PureComponent {
         <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
           上一步
         </Button>,
-        <Button key="cancel" onClick={() => handleModalVisible(false,0)}>
+        <Button key="cancel" onClick={this.cancel}>
           取消
         </Button>,
         <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -234,7 +244,7 @@ class CreateForm extends PureComponent {
         <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
           上一步
         </Button>,
-        <Button key="cancel" onClick={() => handleModalVisible(false,0)}>
+        <Button key="cancel" onClick={this.cancel}>
           取消
         </Button>,
         <Button key="submit" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -243,7 +253,7 @@ class CreateForm extends PureComponent {
       ];
     }
     return [
-      <Button key="cancel" onClick={() => handleModalVisible(false,0)}>
+      <Button key="cancel" onClick={this.cancel}>
         取消
       </Button>,
       <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -265,7 +275,7 @@ class CreateForm extends PureComponent {
         title="接口配置"
         visible={modalVisible}
         footer={this.renderFooter(currentStep)}
-        onCancel={() => handleModalVisible(false,0)}
+        onCancel={() => handleModalVisible()}
       >
         <Steps style={{ marginBottom: 28 }} size="small" current={currentStep}>
           <Step title="基本信息" />
@@ -453,12 +463,10 @@ class Task extends PureComponent {
     });
   };
 
-  handleModalVisible = (flag,currentStep)  => {
+  handleModalVisible = (flag)  => {
     this.setState({
       modalVisible: !!flag,
-      currentStep:currentStep
     });
-
   };
   handleUpdateModalVisible = (flag, record) => {
     this.setState({
@@ -637,7 +645,7 @@ class Task extends PureComponent {
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}>
+            <div className={styles.tableListOperator}>     
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true,0)}>
                 新建
               </Button>

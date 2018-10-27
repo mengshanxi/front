@@ -23,6 +23,10 @@ for (let i = 0; i < 46; i += 1) {
   });
 }
 
+function checkUser(){
+  return ['admin'];
+}
+
 function getJob(req, res, u) {
   let url = u;
   if (!url || Object.prototype.toString.call(url) !== '[object String]') {
@@ -135,5 +139,6 @@ function postJob(req, res, u, b) {
 
 export default {
   'GET /api/job': getJob,
+  'GET /api/checkUser': checkUser,
   'POST /api/job': postJob,
 };

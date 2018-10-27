@@ -43,6 +43,8 @@ export default [
             path: '/dashboard/task',
             name: 'task',
             component: './Dashboard/Task',
+            Routes: ['src/pages/Authorized'],
+            authority: ['admin'],
           },
         ],
       },

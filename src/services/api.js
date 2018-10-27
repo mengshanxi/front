@@ -78,6 +78,11 @@ export async function updateJob(params) {
     },
   });
 }
+
+export   function checkUser() {
+  return request('/api/checkUser');
+}
+
 //--------------------
 export async function fakeSubmitForm(params) {
   return request('/api/forms', {
