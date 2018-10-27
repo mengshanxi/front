@@ -23,8 +23,9 @@ for (let i = 0; i < 46; i += 1) {
   });
 }
 
-function checkUser(){
-  return ['admin'];
+function checkUser() {
+  console.log(100);
+  return "['admin']";
 }
 
 function getJob(req, res, u) {
@@ -88,8 +89,6 @@ function postJob(req, res, u, b) {
   const body = (b && b.body) || req.body;
   const { method, ipAddress, confPath, key } = body;
 
-
-
   switch (method) {
     /* eslint no-case-declarations:0 */
     case 'delete':
@@ -139,6 +138,5 @@ function postJob(req, res, u, b) {
 
 export default {
   'GET /api/job': getJob,
-  'GET /api/checkUser': checkUser,
   'POST /api/job': postJob,
 };
