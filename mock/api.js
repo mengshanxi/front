@@ -346,5 +346,5 @@ export default {
   'POST /api/fake_list': postFakeList,
   'GET /api/captcha': getFakeCaptcha,
   'GET /api/students': students,
-  'DELETE /api/student': deleteStudent,
+  'DELETE /api/student': deleteStudent, 
 };
