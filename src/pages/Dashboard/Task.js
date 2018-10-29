@@ -1009,7 +1009,7 @@ class Task extends PureComponent {
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues, isDetail, details,uploadVisible } = this.state;
     if (isDetail)
-      return (<BasicProfile details={details} goBack={this.goBack.bind(this)}></BasicProfile>)
+      return (<BasicProfile details={details} goBack={this.goBack}></BasicProfile>)
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
