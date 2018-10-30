@@ -16,15 +16,21 @@ import {
   DatePicker,
   Modal,
   message,
-  Badge,
-  Divider,
   Steps,
   Radio,
+  Badge,
+  Table,
+  Divider,
+  Upload
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import DescriptionList from '@/components/DescriptionList';
 
 import styles from './Task.less';
+
+//https://blog.csdn.net/qq_33514421/article/details/81507354
+//https://blog.csdn.net/zerocher/article/details/81843242
 
 
 const FormItem = Form.Item;
@@ -38,6 +44,193 @@ const getValue = obj =>
     .join(',');
 const versionMap = ['default', 'processing'];
 const version = ['MOCK版本', '服务版本'];
+
+const { Description } = DescriptionList;
+
+const progressColumns = [
+  {
+    title: '时间',
+    dataIndex: 'time',
+    key: 'time',
+  },
+  {
+    title: '当前进度',
+    dataIndex: 'rate',
+    key: 'rate',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status',
+    render: text =>
+      text === 'success' ? (
+        <Badge status="success" text="成功" />
+      ) : (
+          <Badge status="processing" text="进行中" />
+        ),
+  },
+  {
+    title: '操作员ID',
+    dataIndex: 'operator',
+    key: 'operator',
+  },
+  {
+    title: '耗时',
+    dataIndex: 'cost',
+    key: 'cost',
+  },
+];
+
+
+@connect(({ profile, loading }) => ({
+  profile,
+  loading: loading.effects['profile/fetchBasic'],
+}))
+
+class BasicProfile extends PureComponent {
+
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'profile/fetchBasic',
+    });
+  }
+
+  render() {
+    const { profile, loading, goBack } = this.props;
+    const { basicGoods, basicProgress } = profile;
+    let goodsData = [];
+    if (basicGoods.length) {
+      let num = 0;
+      let amount = 0;
+      basicGoods.forEach(item => {
+        num += Number(item.num);
+        amount += Number(item.amount);
+      });
+      goodsData = basicGoods.concat({
+        id: '总计',
+        num,
+        amount,
+      });
+    }
+    const renderContent = (value, row, index) => {
+      const obj = {
+        children: value,
+        props: {},
+      };
+      if (index === basicGoods.length) {
+        obj.props.colSpan = 0;
+      }
+      return obj;
+    };
+    const goodsColumns = [
+      {
+        title: '商品编号',
+        dataIndex: 'id',
+        key: 'id',
+        render: (text, row, index) => {
+          if (index < basicGoods.length) {
+            return <a href="">{text}</a>;
+          }
+          return {
+            children: <span style={{ fontWeight: 600 }}>总计</span>,
+            props: {
+              colSpan: 4,
+            },
+          };
+        },
+      },
+      {
+        title: '商品名称',
+        dataIndex: 'name',
+        key: 'name',
+        render: renderContent,
+      },
+      {
+        title: '商品条码',
+        dataIndex: 'barcode',
+        key: 'barcode',
+        render: renderContent,
+      },
+      {
+        title: '单价',
+        dataIndex: 'price',
+        key: 'price',
+        align: 'right',
+        render: renderContent,
+      },
+      {
+        title: '数量（件）',
+        dataIndex: 'num',
+        key: 'num',
+        align: 'right',
+        render: (text, row, index) => {
+          if (index < basicGoods.length) {
+            return text;
+          }
+          return <span style={{ fontWeight: 600 }}>{text}</span>;
+        },
+      },
+      {
+        title: '金额',
+        dataIndex: 'amount',
+        key: 'amount',
+        align: 'right',
+        render: (text, row, index) => {
+          if (index < basicGoods.length) {
+            return text;
+          }
+          return <span style={{ fontWeight: 600 }}>{text}</span>;
+        },
+      },
+    ];
+    return (
+      <PageHeaderWrapper title="基础详情页">
+        <Card bordered={false}>
+          <DescriptionList size="large" title="退款申请" style={{ marginBottom: 32 }}>
+            <Description term="取货单号">1000000000</Description>
+            <Description term="状态">已取货</Description>
+            <Description term="销售单号">1234123421</Description>
+            <Description term="子订单">3214321432</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
+            <Description term="用户姓名">付小小</Description>
+            <Description term="联系电话">18100000000</Description>
+            <Description term="常用快递">菜鸟仓储</Description>
+            <Description term="取货地址">浙江省杭州市西湖区万塘路18号</Description>
+            <Description term="备注">无</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <div className={styles.title}>退货商品</div>
+          <Table
+            style={{ marginBottom: 24 }}
+            pagination={false}
+            loading={loading}
+            dataSource={goodsData}
+            columns={goodsColumns}
+            rowKey="id"
+          />
+          <div className={styles.title}>退货进度</div>
+          <Table
+            style={{ marginBottom: 16 }}
+            pagination={false}
+            loading={loading}
+            dataSource={basicProgress}
+            columns={progressColumns}
+          />
+        </Card>
+        <Button icon="plus" type="primary" onClick={() => goBack()}>
+          返回
+              </Button>
+      </PageHeaderWrapper>
+    );
+  }
+}
 
 @Form.create()
 class UpdateForm extends PureComponent {
@@ -53,7 +246,7 @@ class UpdateForm extends PureComponent {
     }
   }
   render() {
-    const { form, handleUpdate,updateModalVisible,handleUpdateModalVisible } = this.props;
+    const { form, handleUpdate, updateModalVisible, handleUpdateModalVisible } = this.props;
     const { formVals } = this.state;
     //console.log(formVals)
     const okHandle = () => {
@@ -147,7 +340,7 @@ class CreateForm extends PureComponent {
     });
   };
 
-  cancel = ()  => {
+  cancel = () => {
     const { handleModalVisible } = this.props;
     this.setState({
       currentStep: 0,
@@ -155,9 +348,9 @@ class CreateForm extends PureComponent {
     handleModalVisible();
   };
 
-  renderContent = (currentStep,formVals) => {
+  renderContent = (currentStep, formVals) => {
     const { form } = this.props;
-    
+
     if (currentStep === 1) {
       return [
         <FormItem key="version" {...this.formLayout} label="接口版本">
@@ -172,7 +365,7 @@ class CreateForm extends PureComponent {
         </FormItem>,
         <FormItem key="type" {...this.formLayout} label="立即生效">
           {form.getFieldDecorator('type', {
-               initialValue: formVals.type,
+            initialValue: formVals.type,
           })(
             <RadioGroup>
               <Radio value="0">否</Radio>
@@ -198,7 +391,7 @@ class CreateForm extends PureComponent {
         </FormItem>,
         <FormItem key="frequency" {...this.formLayout} label="调度周期">
           {form.getFieldDecorator('frequency', {
-              initialValue: formVals.frequency,
+            initialValue: formVals.frequency,
           })(
             <Select style={{ width: '100%' }}>
               <Option value="month">月</Option>
@@ -211,13 +404,13 @@ class CreateForm extends PureComponent {
     return [
       <FormItem key="ipAddress" {...this.formLayout} label="服务器IP">
         {form.getFieldDecorator('ipAddress', {
-           initialValue: formVals.ipAddress,
+          initialValue: formVals.ipAddress,
           jobs: [{ required: true, message: '请输入服务器IP！' }],
         })(<Input placeholder="请输入" />)}
       </FormItem>,
       <FormItem key="confPath" {...this.formLayout} label="配置文件路径">
         {form.getFieldDecorator('confPath', {
-             initialValue: formVals.confPath,
+          initialValue: formVals.confPath,
           jobs: [{ required: true, message: '请输入配置文件路径！', min: 5 }],
         })(<TextArea rows={4} placeholder="请输入有效路径" />)}
       </FormItem>,
@@ -264,7 +457,7 @@ class CreateForm extends PureComponent {
 
   render() {
     const { modalVisible, handleModalVisible } = this.props;
-    const { currentStep,formVals } = this.state;
+    const { currentStep, formVals } = this.state;
 
     //console.log(this.state)
     return (
@@ -282,7 +475,171 @@ class CreateForm extends PureComponent {
           <Step title="版本信息" />
           <Step title="设定调度周期" />
         </Steps>
-        {this.renderContent(currentStep,formVals)}
+        {this.renderContent(currentStep, formVals)}
+      </Modal>
+    );
+  }
+}
+
+@Form.create()
+@connect(({ category }) => ({
+  category,
+}))
+class UploadForm extends PureComponent {
+  constructor(props) {
+    super(props);
+  }
+  state = {
+    loading: false,
+    file_name: '',
+    handleUploadVisible:false,
+  };
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'category/cate',
+    });
+  }
+
+  getBase64(img, callback) {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
+  }
+
+  handleChange = (info) => {
+    if (info.file.status === 'uploading') {
+      this.setState({ loading: true });
+      return;
+    }
+    if (info.file.status === 'done') {
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
+  beforeUpload(file) {
+    this.getBase64(file, (imageUrl) => {
+      this.setState({
+        imageUrl,
+        loading: false
+      })
+      if (imageUrl) {
+        let apirul = '/api/upload';
+        let u = imageUrl.substring(imageUrl.indexOf(',') + 1, imageUrl.length)
+        let data = {
+          image_name: file.name,
+          image_data: u
+        }
+        fetch(apirul, {
+          method: 'post',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data),
+        })
+          .then(res => res.json())
+          .then(res => {
+            this.setState({ pic_url: res.pic_url });
+          })
+      }
+    });
+    return 1;
+  }
+
+  handleSubmit = (e) => {
+    let apirul = '/api/saveUpload';
+    //接口地址
+    let data = {
+      name: this.props.form.getFieldsValue().name,
+      pic_url: this.state.pic_url
+    }
+    fetch(apirul, {
+      method: 'post',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data),
+    })
+      .then(function (res) {
+        this.props.router.push("/Dashboard/monitor")
+        let rtn= res.json();
+
+      })
+      .then(res => {
+        this.props.router.push("/Dashboard/monitor")
+      })
+  }
+
+  
+  render() {
+    const FormItem = Form.Item;
+    const formItemLayout = {
+      labelCol: { span: 6 },
+      wrapperCol: { span: 14 },
+    };
+    const { uploadVisible } = this.props;
+    const { handleUploadVisible } = this.props;
+
+    const uploadButton = (
+      <div>
+        <Icon type={this.state.loading ? 'loading' : 'plus'} />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    );
+    const imageUrl = this.state.imageUrl;
+    const { getFieldProps } = this.props.form;
+    
+    return (
+      <Modal
+        width={640}
+        bodyStyle={{ padding: '32px 40px 48px' }}
+        destroyOnClose
+        title="接口配置"
+        visible={uploadVisible}
+        onCancel={() => handleUploadVisible()}
+     
+      >
+       <Form onSubmit={this.handleSubmit} >
+        <FormItem
+          {...formItemLayout}
+          label="图片名称"
+        >
+          <Input {...getFieldProps('name')} placeholder="Please input name" style={{ width: "300px" }} />
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="图片类型"
+        >
+          <Select>
+          </Select>
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="上传图片"
+        >
+          <Upload
+            {...getFieldProps('pic_url')}
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            action=""
+            beforeUpload={this.beforeUpload.bind(this)}
+            onChange={this.handleChange}
+          
+         >
+            {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
+
+          </Upload>
+        </FormItem>
+        <FormItem
+          wrapperCol={{ span: 12, offset: 6 }}
+        >
+          <Button type="primary" htmlType="submit">提交</Button>
+        </FormItem>
+      </Form>
       </Modal>
     );
   }
@@ -351,7 +708,7 @@ class Task extends PureComponent {
         <Fragment>
           <a onClick={() => this.handleUpdateModalVisible(true, record)}>编辑</a>
           <Divider type="vertical" />
-          <a href="">详情</a>
+          <a onClick={() => this.goDetail(record)}>详情</a>
         </Fragment>
       ),
     },
@@ -463,11 +820,18 @@ class Task extends PureComponent {
     });
   };
 
-  handleModalVisible = (flag)  => {
+  handleModalVisible = (flag) => {
     this.setState({
       modalVisible: !!flag,
     });
   };
+  handleUploadVisible = (flag) => {
+    this.setState({
+      uploadVisible: !!flag,
+    });
+  };
+
+  
   handleUpdateModalVisible = (flag, record) => {
     this.setState({
       updateModalVisible: !!flag,
@@ -475,6 +839,11 @@ class Task extends PureComponent {
     });
   };
 
+  handleUploadVisible = (flag) => {
+    this.setState({
+      uploadVisible: flag,
+    });
+  };
   handleAdd = fields => {
     const { dispatch } = this.props;
     dispatch({
@@ -484,8 +853,22 @@ class Task extends PureComponent {
       },
     });
     message.success('添加成功');
-    this.handleModalVisible(false,0);
+    this.handleModalVisible(false, 0);
   };
+
+  goDetail = (record) => {
+    this.setState({
+      isDetail: true,
+      details: record,
+      goBack: this.goBack
+    });
+  }
+  goBack = () => {
+    this.setState({
+      isDetail: false,
+      details: {},
+    });
+  }
 
   handleUpdate = fields => {
     const { dispatch } = this.props;
@@ -624,7 +1007,9 @@ class Task extends PureComponent {
       job: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, stepFormValues, isDetail, details,uploadVisible } = this.state;
+    if (isDetail)
+      return (<BasicProfile details={details} goBack={this.goBack}></BasicProfile>)
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -635,19 +1020,24 @@ class Task extends PureComponent {
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
+      handleUploadVisible:this.handleUploadVisible
     };
     const updateMethods = {
       handleUpdateModalVisible: this.handleUpdateModalVisible,
       handleUpdate: this.handleUpdate,
     };
+
     return (
       <PageHeaderWrapper title="">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}>     
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true,0)}>
+            <div className={styles.tableListOperator}>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true, 0)}>
                 新建
+              </Button>
+              <Button icon="plus" type="primary" onClick={() => this.handleUploadVisible()}>
+                上传
               </Button>
               {selectedRows.length > 0 && (
                 <span>
@@ -671,6 +1061,7 @@ class Task extends PureComponent {
           </div>
         </Card>
         <CreateForm {...parentMethods} modalVisible={modalVisible} />
+        <UploadForm {...parentMethods} uploadVisible={uploadVisible} />
         {stepFormValues && Object.keys(stepFormValues).length ? (
           <UpdateForm
             {...updateMethods}

@@ -332,7 +332,13 @@ const students = [
 function deleteStudent(req, res) {
   return res.json('ok');
 }
-
+function upload() {
+  console.log(11)
+  return {"pic_url":"test"};
+}
+function saveUpload() {
+  return {"flag":"success"};
+}
 export default {
   'GET /api/project/notice': getNotice,
   'GET /api/activities': getActivities,
@@ -347,4 +353,7 @@ export default {
   'GET /api/captcha': getFakeCaptcha,
   'GET /api/students': students,
   'DELETE /api/student': deleteStudent, 
+  'POST /api/upload':upload,
+  'POST /api/saveUpload':saveUpload,
+  
 };
