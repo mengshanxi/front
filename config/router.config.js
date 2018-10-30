@@ -48,6 +48,20 @@ export default [
           },
         ],
       },
+      {
+        path: '/system',
+        name: 'system',
+        icon: 'dashboard',
+        routes: [
+          {
+            path: '/system/website',
+            name: 'website',
+            component: './System/Website',
+            Routes: ['src/pages/Authorized'],
+            authority: ['admin'],
+          },
+        ],
+      },
       // forms
       {
         path: '/form',

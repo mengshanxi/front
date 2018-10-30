@@ -21,6 +21,8 @@ export default {
   'menu.dashboard.workplace': 'Workplace',
   'menu.dashboard.mine': 'Mine',
   'menu.dashboard.task': 'Task Management',
+  'menu.system': 'System Manager',
+  'menu.system.website': 'Website Manager',
   'menu.form': 'Form',
   'menu.form.basicform': 'Basic Form',
   'menu.form.stepform': 'Step Form',

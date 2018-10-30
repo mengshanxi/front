@@ -23,6 +23,8 @@ export default {
   'menu.dashboard.mine': '我的',
   'menu.dashboard.workplace': '工作台',
   'menu.dashboard.task': '接口配置',
+  'menu.system': '系统配置',
+  'menu.system.website': '商户管理',
   'menu.form': '表单页',
   'menu.form.basicform': '基础表单',
   'menu.form.stepform': '分步表单',

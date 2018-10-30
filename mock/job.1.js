@@ -6,14 +6,20 @@ for (let i = 0; i < 46; i += 1) {
   tableListDataSource.push({
     key: i,
     disabled: i % 6 === 0,
-    merchantName: `公司${i}`,
-    domainName: `域名 ${i}`,
-    websiteName: `网站名 ${i}`,
-    industry1: `一级分类 ${i}`,
-    industry2: `二级分类 ${i}`,
-    attention: i / 2,
+    href: 'https://ant.design',
+    avatar: [
+      'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
+      'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png',
+    ][i % 2],
+    ipAddress: `172.17.161.7${i}`,
+    confPath: `/home/config/http.conf ${i}`,
+    owner: '曲丽丽',
+    desc: '这是一段描述',
+    number: Math.floor(Math.random() * 10),
+    version: Math.floor(Math.random() * 10) % 2,
     updatedAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     createdAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
+    progress: Math.ceil(Math.random() * 100),
   });
 }
 
