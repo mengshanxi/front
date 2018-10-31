@@ -41,6 +41,13 @@ export default {
         payload: response,
       });
       if (callback) callback();
+    }, 
+    *upload({ payload }, { call, put }) {
+      const response = yield call(queryJob, payload);
+      yield put({
+        type: 'save',
+        payload: response,
+      });
     },
   },
 

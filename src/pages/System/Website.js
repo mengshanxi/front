@@ -20,6 +20,7 @@ import {
   Divider,
   Steps,
   Radio,
+  Upload,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -314,6 +315,51 @@ class CreateForm extends PureComponent {
   }
 }
 
+@Form.create()
+class ImportForm extends PureComponent {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const { importModalVisible, handleImportModalVisible } = this.props;
+
+
+    const props = {
+      name: 'file',
+      action: '/api/website/import',
+      onChange(info) {
+        if (info.file.status !== 'uploading') {
+          console.log(info.file, info.fileList);
+        }
+        if (info.file.status === 'done') {
+          handleImportModalVisible();
+          message.success(`${info.file.name} 上传成功。`);
+        } else if (info.file.status === 'error') {
+          handleImportModalVisible();
+          message.error(`${info.file.name} 上传失败。`);
+        }
+      }
+    };
+    return (
+      <Modal
+        width={640}
+        bodyStyle={{ padding: '32px 40px 48px' }}
+        destroyOnClose
+        title="批量导入"
+        visible={importModalVisible}
+        footer={[<Button key="back" type="ghost"  onClick={() => handleImportModalVisible()}>取消</Button>]}
+
+      >
+        <Upload {...props}>
+          <Button type="ghost">
+            <Icon type="upload" /> 点击上传
+    </Button>
+        </Upload>
+      </Modal>
+    );
+  }
+}
 /* eslint react/no-multi-comp:0 */
 @connect(({ website, loading }) => ({
   website,
@@ -328,6 +374,7 @@ class Task extends PureComponent {
     selectedRows: [],
     formValues: {},
     stepFormValues: {},
+    importModalVisible: false,
   };
 
   columns = [
@@ -379,7 +426,7 @@ class Task extends PureComponent {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>编辑</a>
+          <a icon="edit" onClick={() => this.handleUpdateModalVisible(true, record)}>编辑</a>
           <Divider type="vertical" />
           <a href="">详情</a>
         </Fragment>
@@ -505,6 +552,8 @@ class Task extends PureComponent {
     });
   };
 
+
+
   handleAdd = fields => {
     const { dispatch } = this.props;
     dispatch({
@@ -530,6 +579,12 @@ class Task extends PureComponent {
 
     message.success('配置成功');
     this.handleUpdateModalVisible();
+  };
+
+  handleImportModalVisible = (flag) => {
+    this.setState({
+      importModalVisible: !!flag,
+    });
   };
 
   renderSimpleForm() {
@@ -655,7 +710,7 @@ class Task extends PureComponent {
       website: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, stepFormValues, importModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -680,6 +735,15 @@ class Task extends PureComponent {
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true, 0)}>
                 新建
               </Button>
+              <Button icon="arrow-down" type="ghost" onClick={() => this.handleImportModalVisible(true, 0)}>
+                批量导入
+              </Button>
+              <Button icon="plus" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
+                批量导出
+              </Button>
+              <Button icon="plus" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
+                模板下载
+              </Button>
               {selectedRows.length > 0 && (
                 <span>
                   <Button>批量操作</Button>
@@ -701,6 +765,7 @@ class Task extends PureComponent {
             />
           </div>
         </Card>
+        <ImportForm handleImportModalVisible={this.handleImportModalVisible} importModalVisible={importModalVisible} />
         <CreateForm {...parentMethods} modalVisible={modalVisible} />
         {stepFormValues && Object.keys(stepFormValues).length ? (
           <UpdateForm

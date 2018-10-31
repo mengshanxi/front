@@ -78,6 +78,15 @@ export async function updateJob(params) {
     },
   });
 }
+export async function importWebsite(params) {
+  return request('/api/website/import', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'update',
+    },
+  });
+}
 
 //--------------------
 export async function fakeSubmitForm(params) {

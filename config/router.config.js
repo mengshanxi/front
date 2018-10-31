@@ -57,8 +57,6 @@ export default [
             path: '/system/website',
             name: 'website',
             component: './System/Website',
-            Routes: ['src/pages/Authorized'],
-            authority: ['admin'],
           },
         ],
       },
