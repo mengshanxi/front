@@ -74,6 +74,58 @@ function getJob(req, res, u) {
   return res.json(result);
 }
 
+function getWebsite(req, res, u) {
+  let url = u;
+  if (!url || Object.prototype.toString.call(url) !== '[object String]') {
+    url = req.url; // eslint-disable-line
+  }
+
+  const params = parse(url, true).query;
+
+  let dataSource = tableListDataSource;
+
+  if (params.sorter) {
+    const s = params.sorter.split('_');
+    dataSource = dataSource.sort((prev, next) => {
+      if (s[1] === 'descend') {
+        return next[s[0]] - prev[s[0]];
+      }
+      return prev[s[0]] - next[s[0]];
+    });
+  }
+
+  if (params.version) {
+    const version = params.version.split(',');
+    let filterDataSource = [];
+    version.forEach(s => {
+      filterDataSource = filterDataSource.concat(
+        dataSource.filter(data => parseInt(data.version, 10) === parseInt(s[0], 10))
+      );
+    });
+    dataSource = filterDataSource;
+  }
+
+  if (params.ipAddress) {
+    dataSource = dataSource.filter(data => data.ipAddress.indexOf(params.ipAddress) > -1);
+  }
+
+  let pageSize = 10;
+  if (params.pageSize) {
+    pageSize = params.pageSize * 1;
+  }
+
+  const result = {
+    list: dataSource,
+    pagination: {
+      total: dataSource.length,
+      pageSize,
+      current: parseInt(params.currentPage, 10) || 1,
+    },
+  };
+
+  return res.json(result);
+}
+
 function postJob(req, res, u, b) {
   let url = u;
   if (!url || Object.prototype.toString.call(url) !== '[object String]') {
@@ -132,5 +184,6 @@ function postJob(req, res, u, b) {
 
 export default {
   'GET /api/job': getJob,
+  'GET /api/website': getWebsite,
   'POST /api/job': postJob,
 };

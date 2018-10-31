@@ -27,6 +27,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './Website.less';
 
+//http://lucifier129.github.io/ant-design/components/upload/
 
 const FormItem = Form.Item;
 const { Step } = Steps;
@@ -328,15 +329,16 @@ class ImportForm extends PureComponent {
     const props = {
       name: 'file',
       action: '/api/website/import',
+      listType:'picture',
       onChange(info) {
         if (info.file.status !== 'uploading') {
           console.log(info.file, info.fileList);
         }
         if (info.file.status === 'done') {
-          handleImportModalVisible();
+          //handleImportModalVisible();
           message.success(`${info.file.name} 上传成功。`);
         } else if (info.file.status === 'error') {
-          handleImportModalVisible();
+          //handleImportModalVisible();
           message.error(`${info.file.name} 上传失败。`);
         }
       }
@@ -366,7 +368,7 @@ class ImportForm extends PureComponent {
   loading: loading.models.website,
 }))
 @Form.create()
-class Task extends PureComponent {
+class Website extends PureComponent {
   state = {
     modalVisible: false,
     updateModalVisible: false,
@@ -559,7 +561,12 @@ class Task extends PureComponent {
     dispatch({
       type: 'website/add',
       payload: {
-        ipAddress: fields.ipAddress,
+        merchantName: fields.merchantName,
+        websiteName: fields.websiteName,
+        domainName: fields.domainName,
+        industry1: fields.industry1,
+        industry2: fields.industry2,
+        attention: fields.attention,
       },
     });
     message.success('添加成功');
@@ -779,4 +786,4 @@ class Task extends PureComponent {
   }
 }
 
-export default Task;
+export default Website;

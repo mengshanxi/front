@@ -48,7 +48,6 @@ export async function queryJob(params) {
   //return request(`/api/job?${stringify(params)}`);
   return request(`/api/job`);
 }
-
 export async function removeJob(params) {
   return request('/api/job', {
     method: 'POST',
@@ -78,15 +77,7 @@ export async function updateJob(params) {
     },
   });
 }
-export async function importWebsite(params) {
-  return request('/api/website/import', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'update',
-    },
-  });
-}
+
 
 //--------------------
 export async function fakeSubmitForm(params) {
@@ -169,4 +160,34 @@ export async function queryNotices() {
 
 export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
+}
+//----------------------website--------------------
+export async function queryWebsite(params) {
+  return request(`/api/website?${stringify(params)}`);
+  /**
+   * 
+   */
+  return request(`/api/website`, {
+    method: 'GET',
+    body: {
+      ...params,
+    },
+  });
+}
+export async function importWebsite(params) {
+  return request('/api/website/import', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'update',
+    },
+  });
+}
+export async function addWebsite(params) {
+  return request('/api/website', {
+    method: 'POST',
+    body: {
+      ...params,
+    },
+  });
 }

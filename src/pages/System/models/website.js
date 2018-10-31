@@ -1,4 +1,4 @@
-import { queryJob, removeJob, addJob, updateJob } from '@/services/api';
+import { queryJob, removeJob, addJob, updateJob,queryWebsite,importWebsite } from '@/services/api';
 
 export default {
   namespace: 'website',
@@ -11,8 +11,9 @@ export default {
   },
 
   effects: {
+    //--查询website列表
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryJob, payload);
+      const response = yield call(queryWebsite, payload);
       yield put({
         type: 'save',
         payload: response,
@@ -42,8 +43,8 @@ export default {
       });
       if (callback) callback();
     }, 
-    *upload({ payload }, { call, put }) {
-      const response = yield call(queryJob, payload);
+    *import({ payload }, { call, put }) {
+      const response = yield call(importWebsite, payload);
       yield put({
         type: 'save',
         payload: response,
