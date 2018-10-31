@@ -1,4 +1,4 @@
-import { queryJob, removeJob, addJob, updateJob,queryWebsite,importWebsite } from '@/services/api';
+import { queryJob, removeJob, addJob, updateJob,queryWebsite,addWebsite,importWebsite } from '@/services/api';
 
 export default {
   namespace: 'website',
@@ -20,7 +20,7 @@ export default {
       });
     },
     *add({ payload, callback }, { call, put }) {
-      const response = yield call(addJob, payload);
+      const response = yield call(addWebsite, payload);
       yield put({
         type: 'save',
         payload: response,
