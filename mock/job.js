@@ -18,7 +18,6 @@ for (let i = 0; i < 46; i += 1) {
 }
 
 function checkUser() {
-  console.log(100);
   return "['admin']";
 }
 
@@ -179,7 +178,7 @@ function postJob(req, res, u, b) {
     },
   };
 
-  return res.json(result);
+  return res.json([]);
 }
 
 export default {

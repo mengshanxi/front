@@ -53,7 +53,7 @@ const CreateForm = Form.create()(props => {
       title="新建规则"
       visible={modalVisible}
       onOk={okHandle}
-      onCancel={() => handleModalVisible()}
+      onCancel={() => handleModalVisible}
     >
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="描述">
         {form.getFieldDecorator('desc', {
