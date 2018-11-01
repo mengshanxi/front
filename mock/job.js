@@ -186,4 +186,5 @@ export default {
   'GET /api/job': getJob,
   'GET /api/website': getWebsite,
   'POST /api/job': postJob,
+  'POST /api/website': postJob,
 };
