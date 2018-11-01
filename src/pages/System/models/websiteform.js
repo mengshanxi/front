@@ -3,21 +3,26 @@ import { message } from 'antd';
 import { fakeSubmitForm } from '@/services/api';
 
 export default {
-  namespace: 'form1',
+  namespace: 'form',
 
   state: {
-    step: {
-      payAccount: 'ant-design@alipay.com',
-      receiverAccount: 'test@example.com',
-      receiverName: 'Alex',
-      amount: '500',
-    },
+    step: 'form',//success error
   },
 
   effects: {
-    *submitRegularForm({ payload }, { call }) {
-      yield call(fakeSubmitForm, payload);
-      message.success('提交成功');
+    *submitRegularForm({ payload }, { call, put }) {
+      const response = yield call(fakeSubmitForm, payload);
+      if (response) {
+        yield put({
+          type: 'saveSuccess',
+          payload,
+        });
+      } else {
+        yield put({
+          type: 'saveError',
+          payload,
+        });
+      }
     },
     *submitStepForm({ payload }, { call, put }) {
       yield call(fakeSubmitForm, payload);
@@ -29,18 +34,21 @@ export default {
     },
     *submitAdvancedForm({ payload }, { call }) {
       yield call(fakeSubmitForm, payload);
-      message.success('提交成功');
+
+      //message.success('提交成功');
     },
   },
 
   reducers: {
-    saveStepFormData(state, { payload }) {
+    saveError(state, { payload }) {
       return {
         ...state,
-        step: {
-          ...state.step,
-          ...payload,
-        },
+        step: "error",
+      };
+    }, saveSuccess(state, { payload }) {
+      return {
+        ...state,
+        step: "success",
       };
     },
   },

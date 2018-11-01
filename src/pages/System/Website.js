@@ -24,6 +24,8 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import WebsiteDetail from '@/pages/System/WebsiteDetail';
+import CreateForm from '@/pages/System/BasicForm';
 
 import styles from './Website.less';
 
@@ -103,7 +105,7 @@ class UpdateForm extends PureComponent {
 }
 
 @Form.create()
-class CreateForm extends PureComponent {
+class CreateForm1 extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -329,7 +331,7 @@ class ImportForm extends PureComponent {
     const props = {
       name: 'file',
       action: '/api/website/import',
-      listType:'picture',
+      listType: 'picture',
       onChange(info) {
         if (info.file.status !== 'uploading') {
           console.log(info.file, info.fileList);
@@ -350,7 +352,7 @@ class ImportForm extends PureComponent {
         destroyOnClose
         title="批量导入"
         visible={importModalVisible}
-        footer={[<Button key="back" type="ghost"  onClick={() => handleImportModalVisible()}>取消</Button>]}
+        footer={[<Button key="back" type="ghost" onClick={() => handleImportModalVisible()}>取消</Button>]}
 
       >
         <Upload {...props}>
@@ -377,6 +379,8 @@ class Website extends PureComponent {
     formValues: {},
     stepFormValues: {},
     importModalVisible: false,
+    isPage: true,
+    isCreate: false,
   };
 
   columns = [
@@ -430,7 +434,7 @@ class Website extends PureComponent {
         <Fragment>
           <a icon="edit" onClick={() => this.handleUpdateModalVisible(true, record)}>编辑</a>
           <Divider type="vertical" />
-          <a href="">详情</a>
+          <a onClick={() => this.goDetail(record)}>详情</a>
         </Fragment>
       ),
     },
@@ -554,7 +558,16 @@ class Website extends PureComponent {
     });
   };
 
+  goDetail = (record) => {
+    this.setState({ isPage: false, values: record });
+  };
+  goCreate = () => {
+    this.setState({ isCreate: true, isPage: false });
+  };
+  goBack = () => { this.setState({ isPage: true }); }
 
+
+  goPage = () => { this.setState({ isCreate: false, isPage: true }); }
 
   handleAdd = fields => {
     const { dispatch } = this.props;
@@ -570,7 +583,7 @@ class Website extends PureComponent {
       },
     });
     message.success('添加成功');
-    this.handleModalVisible(false, 0);
+    //this.handleModalVisible(false, 0);
   };
 
   handleUpdate = fields => {
@@ -717,7 +730,7 @@ class Website extends PureComponent {
       website: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, stepFormValues, importModalVisible } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, stepFormValues, importModalVisible, isPage, isCreate } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -733,56 +746,62 @@ class Website extends PureComponent {
       handleUpdateModalVisible: this.handleUpdateModalVisible,
       handleUpdate: this.handleUpdate,
     };
-    return (
-      <PageHeaderWrapper title="">
-        <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true, 0)}>
-                新建
+    if (isPage) {
+      return (
+        <PageHeaderWrapper title="">
+          <Card bordered={false}>
+            <div className={styles.tableList}>
+              <div className={styles.tableListForm}>{this.renderForm()}</div>
+              <div className={styles.tableListOperator}>
+                <Button icon="plus" type="primary" onClick={() => this.goCreate()}>
+                  新建
               </Button>
-              <Button icon="arrow-down" type="ghost" onClick={() => this.handleImportModalVisible(true, 0)}>
-                批量导入
+                <Button icon="arrow-down" type="ghost" onClick={() => this.handleImportModalVisible(true, 0)}>
+                  批量导入
               </Button>
-              <Button icon="plus" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
-                批量导出
+                <Button icon="plus" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
+                  批量导出
               </Button>
-              <Button icon="plus" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
-                模板下载
+                <Button icon="plus" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
+                  模板下载
               </Button>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Button>批量操作</Button>
-                  <Dropdown overlay={menu}>
-                    <Button>
-                      更多操作 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </span>
-              )}
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Button>批量操作</Button>
+                    <Dropdown overlay={menu}>
+                      <Button>
+                        更多操作 <Icon type="down" />
+                      </Button>
+                    </Dropdown>
+                  </span>
+                )}
+              </div>
+              <StandardTable
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columns={this.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
             </div>
-            <StandardTable
-              selectedRows={selectedRows}
-              loading={loading}
-              data={data}
-              columns={this.columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
+          </Card>
+          <ImportForm handleImportModalVisible={this.handleImportModalVisible} importModalVisible={importModalVisible} />
+          <CreateForm1 {...parentMethods} modalVisible={modalVisible} />
+          {stepFormValues && Object.keys(stepFormValues).length ? (
+            <UpdateForm
+              {...updateMethods}
+              updateModalVisible={updateModalVisible}
+              values={stepFormValues}
             />
-          </div>
-        </Card>
-        <ImportForm handleImportModalVisible={this.handleImportModalVisible} importModalVisible={importModalVisible} />
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        {stepFormValues && Object.keys(stepFormValues).length ? (
-          <UpdateForm
-            {...updateMethods}
-            updateModalVisible={updateModalVisible}
-            values={stepFormValues}
-          />
-        ) : null}
-      </PageHeaderWrapper>
-    );
+          ) : null}
+        </PageHeaderWrapper>
+      );
+    }
+    if (isCreate) {
+      return (<CreateForm goPage={this.goPage.bind(this)}></CreateForm>);
+    }
+    return (<WebsiteDetail values={this.state.values} goBack={this.goBack.bind(this)}></WebsiteDetail>);
   }
 }
 
