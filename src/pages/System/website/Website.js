@@ -24,8 +24,8 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import WebsiteDetail from '@/pages/System/WebsiteDetail';
-import CreateForm from '@/pages/System/BasicForm';
+import Detail from '@/pages/System/website/Detail';
+import CreateForm from '@/pages/System/website/CreateForm';
 
 import styles from './Website.less';
 
@@ -799,9 +799,10 @@ class Website extends PureComponent {
       );
     }
     if (isCreate) {
-      return (<CreateForm goPage={this.goPage.bind(this)}></CreateForm>);
+      const forms={step:'form'}
+      return (<CreateForm goPage={this.goPage.bind(this)} forms={forms}></CreateForm>);
     }
-    return (<WebsiteDetail values={this.state.values} goBack={this.goBack.bind(this)}></WebsiteDetail>);
+    return (<Detail values={this.state.values} goBack={this.goBack.bind(this)}></Detail>);
   }
 }
 

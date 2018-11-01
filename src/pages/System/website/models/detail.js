@@ -1,7 +1,7 @@
 import { queryBasicProfile, queryAdvancedProfile } from '@/services/api';
 
 export default {
-  namespace: 'websitedetail',
+  namespace: 'detail',
 
   state: {
     basicGoods: [],

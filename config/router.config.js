@@ -56,7 +56,7 @@ export default [
           {
             path: '/system/website',
             name: 'website',
-            component: './System/Website',
+            component: './System/website/Website',
           },
         ],
       },

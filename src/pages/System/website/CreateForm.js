@@ -24,13 +24,17 @@ const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 
 
-@connect(({ loading }) => ({
-  submitting: loading.effects['form/submitRegularForm'],
+@connect(({ forms,loading }) => ({
+  forms,
+  loading: loading.models.forms,
 }))
 @Form.create()
 class BasicForms extends PureComponent {
+  constructor(props) {
+    super(props);
 
-  state = { step: "form" }
+  }
+  //state = { step: "form" }
 
   handleSubmit = e => {
     const { dispatch, form } = this.props;
@@ -38,7 +42,7 @@ class BasicForms extends PureComponent {
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         dispatch({
-          type: 'form/submitRegularForm',
+          type: 'forms/submitRegularForm',
           payload: values,
         });
         //this.isSuccess();
@@ -91,9 +95,8 @@ class BasicForms extends PureComponent {
       </Fragment>
     );
 
-    //----------------
-    const { step } = this.state;
-    if (step==='success') {
+
+    if (this.props.forms.step==='success') {
       return (<PageHeaderWrapper>
         <Card bordered={false}>
           <Result
@@ -107,7 +110,7 @@ class BasicForms extends PureComponent {
         </Card>
       </PageHeaderWrapper>);
     }
-    if (step==='error') {
+    if (this.props.forms.step==='error') {
       return (<PageHeaderWrapper>
         <Card bordered={false}>
           <Result

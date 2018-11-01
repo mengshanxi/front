@@ -3,7 +3,7 @@ import { message } from 'antd';
 import { fakeSubmitForm } from '@/services/api';
 
 export default {
-  namespace: 'form',
+  namespace: 'forms',
 
   state: {
     step: 'form',//success error
@@ -12,7 +12,8 @@ export default {
   effects: {
     *submitRegularForm({ payload }, { call, put }) {
       const response = yield call(fakeSubmitForm, payload);
-      if (response) {
+      console.log(response);
+      if (response.code===200) {
         yield put({
           type: 'saveSuccess',
           payload,

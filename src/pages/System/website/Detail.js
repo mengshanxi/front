@@ -3,7 +3,7 @@ import { connect } from 'dva';
 import { Card, Badge, Table, Divider, Button } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from './WebsiteDetail.less';
+import styles from './Detail.less';
 
 const { Description } = DescriptionList;
 
@@ -41,21 +41,21 @@ const progressColumns = [
   },
 ];
 
-@connect(({ websitedetail, loading }) => ({
-  websitedetail,
-  loading: loading.effects['websitedetail/fetchBasic'],
+@connect(({ detail, loading }) => ({
+  detail,
+  loading: loading.effects['detail/fetchBasic'],
 }))
-class WebsiteDetail extends Component {
+class Detail extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'websitedetail/fetchBasic',
+      type: 'detail/fetchBasic',
     });
   }
 
   render() {
-    const { websitedetail, loading } = this.props;
-    const { basicGoods, basicProgress } = websitedetail;
+    const { detail, loading } = this.props;
+    const { basicGoods, basicProgress } = detail;
     let goodsData = [];
     if (basicGoods.length) {
       let num = 0;
@@ -172,4 +172,4 @@ class WebsiteDetail extends Component {
   }
 }
 
-export default WebsiteDetail;
+export default Detail;
