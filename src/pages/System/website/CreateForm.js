@@ -24,7 +24,7 @@ const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 
 
-@connect(({ forms,loading }) => ({
+@connect(({ forms, loading }) => ({
   forms,
   loading: loading.models.forms,
 }))
@@ -34,7 +34,12 @@ class BasicForms extends PureComponent {
     super(props);
 
   }
-  //state = { step: "form" }
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'forms/create',
+    });
+  }
 
   handleSubmit = e => {
     const { dispatch, form } = this.props;
@@ -45,17 +50,10 @@ class BasicForms extends PureComponent {
           type: 'forms/submitRegularForm',
           payload: values,
         });
-        //this.isSuccess();
+
       }
     });
   };
-
-  isSuccess = () => {
-    this.setState({ step: "success" });
-  }
-
-
-
   render() {
     const { submitting } = this.props;
     const {
@@ -83,7 +81,7 @@ class BasicForms extends PureComponent {
 
     //---------------
 
-   
+
     const actions = (
       <Fragment>
         <Button type="primary" onClick={this.props.goPage}>
@@ -94,9 +92,12 @@ class BasicForms extends PureComponent {
         </Button>
       </Fragment>
     );
+    const {
+      forms
+    } = this.props;
 
 
-    if (this.props.forms.step==='success') {
+    if (forms.step === 'success') {
       return (<PageHeaderWrapper>
         <Card bordered={false}>
           <Result
@@ -110,7 +111,7 @@ class BasicForms extends PureComponent {
         </Card>
       </PageHeaderWrapper>);
     }
-    if (this.props.forms.step==='error') {
+    if (forms.step === 'error') {
       return (<PageHeaderWrapper>
         <Card bordered={false}>
           <Result

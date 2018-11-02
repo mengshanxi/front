@@ -799,8 +799,7 @@ class Website extends PureComponent {
       );
     }
     if (isCreate) {
-      const forms={step:'form'}
-      return (<CreateForm goPage={this.goPage.bind(this)} forms={forms}></CreateForm>);
+      return (<CreateForm goPage={this.goPage.bind(this)}></CreateForm>);
     }
     return (<Detail values={this.state.values} goBack={this.goBack.bind(this)}></Detail>);
   }
