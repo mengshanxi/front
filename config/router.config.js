@@ -51,7 +51,7 @@ export default [
       {
         path: '/system',
         name: 'system',
-        icon: 'dashboard',
+        icon: 'setting',
         routes: [
           {
             path: '/system/website',

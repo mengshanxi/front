@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Badge, Table, Divider, Button } from 'antd';
+import { Card, Badge, Table, Divider, Button,Icon } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Detail.less';
@@ -163,9 +163,10 @@ class Detail extends Component {
           />
         </Card>
         <Divider style={{ marginBottom: 10 }} />
-        <Button icon="plus" type="ghost" onClick={this.props.goBack}>
-          返回
-              </Button>
+        <Button type="ghost" onClick={this.props.goBack}>
+          <Icon type="left" />
+          <span>后退</span>
+        </Button>
       </PageHeaderWrapper>
 
     );

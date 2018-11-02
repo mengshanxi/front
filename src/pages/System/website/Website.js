@@ -26,10 +26,13 @@ import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import Detail from '@/pages/System/website/Detail';
 import CreateForm from '@/pages/System/website/CreateForm';
+import EditForm from '@/pages/System/website/EditForm';
+
 
 import styles from './Website.less';
 
 //http://lucifier129.github.io/ant-design/components/upload/
+//https://ant.design/components/date-picker/#components-date-picker-demo-format
 
 const FormItem = Form.Item;
 const { Step } = Steps;
@@ -379,8 +382,7 @@ class Website extends PureComponent {
     formValues: {},
     stepFormValues: {},
     importModalVisible: false,
-    isPage: true,
-    isCreate: false,
+    method: 'PAGE',
   };
 
   columns = [
@@ -432,7 +434,7 @@ class Website extends PureComponent {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <a icon="edit" onClick={() => this.handleUpdateModalVisible(true, record)}>编辑</a>
+          <a icon="edit" onClick={() => this.goEdit(record)}>编辑</a>
           <Divider type="vertical" />
           <a onClick={() => this.goDetail(record)}>详情</a>
         </Fragment>
@@ -546,7 +548,7 @@ class Website extends PureComponent {
     });
   };
 
-  handleModalVisible = (flag) => {
+  handleModalVisible = flag => {
     this.setState({
       modalVisible: !!flag,
     });
@@ -558,16 +560,32 @@ class Website extends PureComponent {
     });
   };
 
+  goEdit = (record) => {
+    this.setState({ method: 'EDIT', formVals: record });
+  };
+
   goDetail = (record) => {
-    this.setState({ isPage: false, values: record });
+    this.setState({ method: 'DETAIL', values: record });
   };
   goCreate = () => {
-    this.setState({ isCreate: true, isPage: false });
+    this.setState({ method: 'CREATE' });
   };
-  goBack = () => { this.setState({ isPage: true }); }
+  goBack = () => {
+    this.setState({ method: 'PAGE' });
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'website/fetch',
+    });
+  }
 
 
-  goPage = () => { this.setState({ isCreate: false, isPage: true }); }
+  goPage = () => {
+    this.setState({ method: 'PAGE' });
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'website/fetch',
+    });
+  }
 
   handleAdd = fields => {
     const { dispatch } = this.props;
@@ -615,7 +633,7 @@ class Website extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="商户名">
+            <FormItem label="商户名" >
               {getFieldDecorator('merchantName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
@@ -730,7 +748,7 @@ class Website extends PureComponent {
       website: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, stepFormValues, importModalVisible, isPage, isCreate } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, stepFormValues, importModalVisible, method } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -746,62 +764,67 @@ class Website extends PureComponent {
       handleUpdateModalVisible: this.handleUpdateModalVisible,
       handleUpdate: this.handleUpdate,
     };
-    if (isPage) {
-      return (
-        <PageHeaderWrapper title="">
-          <Card bordered={false}>
-            <div className={styles.tableList}>
-              <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Button icon="plus" type="primary" onClick={() => this.goCreate()}>
-                  新建
+
+    switch (method) {
+      case 'PAGE':
+        return (
+          <PageHeaderWrapper title="" >
+            <Card bordered={false}>
+              <div className={styles.tableList}>
+                <div className={styles.tableListForm}>{this.renderForm()}</div>
+                <div className={styles.tableListOperator}>
+                  <Button icon="plus" type="primary" onClick={() => this.goCreate()}>
+                    新建
               </Button>
-                <Button icon="arrow-down" type="ghost" onClick={() => this.handleImportModalVisible(true, 0)}>
-                  批量导入
+                  <Button icon="arrow-up" type="ghost" onClick={() => this.handleImportModalVisible(true, 0)}>
+                    批量导入
               </Button>
-                <Button icon="plus" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
-                  批量导出
+                  <Button icon="file" type="ghost" onClick={() => this.handleModalVisible(true)}>
+                    批量导出
               </Button>
-                <Button icon="plus" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
-                  模板下载
+                  <Button icon="download" type="ghost" onClick={() => this.handleModalVisible(true, 0)}>
+                    模板下载
               </Button>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Button>批量操作</Button>
-                    <Dropdown overlay={menu}>
-                      <Button>
-                        更多操作 <Icon type="down" />
-                      </Button>
-                    </Dropdown>
-                  </span>
-                )}
+                  {selectedRows.length > 0 && (
+                    <span>
+                      <Dropdown overlay={menu}>
+                        <Button>
+                          更多操作 <Icon type="down" />
+                        </Button>
+                      </Dropdown>
+                    </span>
+                  )}
+                </div>
+                <StandardTable
+                  selectedRows={selectedRows}
+                  loading={loading}
+                  data={data}
+                  columns={this.columns}
+                  onSelectRow={this.handleSelectRows}
+                  onChange={this.handleStandardTableChange}
+                />
               </div>
-              <StandardTable
-                selectedRows={selectedRows}
-                loading={loading}
-                data={data}
-                columns={this.columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
+            </Card>
+            <ImportForm handleImportModalVisible={this.handleImportModalVisible} importModalVisible={importModalVisible} />
+            <CreateForm1 {...parentMethods} modalVisible={modalVisible} />
+            {stepFormValues && Object.keys(stepFormValues).length ? (
+              <UpdateForm
+                {...updateMethods}
+                updateModalVisible={updateModalVisible}
+                values={stepFormValues}
               />
-            </div>
-          </Card>
-          <ImportForm handleImportModalVisible={this.handleImportModalVisible} importModalVisible={importModalVisible} />
-          <CreateForm1 {...parentMethods} modalVisible={modalVisible} />
-          {stepFormValues && Object.keys(stepFormValues).length ? (
-            <UpdateForm
-              {...updateMethods}
-              updateModalVisible={updateModalVisible}
-              values={stepFormValues}
-            />
-          ) : null}
-        </PageHeaderWrapper>
-      );
+            ) : null}
+          </PageHeaderWrapper>
+        );
+        break;
+      case 'CREATE':
+        return (<CreateForm goPage={this.goPage.bind(this)} goBack={this.goBack.bind(this)}></CreateForm>);
+      case 'DETAIL':
+        return (<Detail values={this.state.values} goBack={this.goBack.bind(this)}></Detail>);
+      case 'EDIT':
+        return (<EditForm formVals={this.state.formVals} goBack={this.goBack.bind(this)}></EditForm>);
     }
-    if (isCreate) {
-      return (<CreateForm goPage={this.goPage.bind(this)}></CreateForm>);
-    }
-    return (<Detail values={this.state.values} goBack={this.goBack.bind(this)}></Detail>);
+
   }
 }
 

@@ -1,19 +1,18 @@
 import { routerRedux } from 'dva/router';
-import { message } from 'antd';
 import { fakeSubmitForm } from '@/services/api';
 
 export default {
-  namespace: 'forms',
+  namespace: 'edits',
 
   state: {
-    step: 'SHOW_FORM',//success error
+    step: 'form',//success error
   },
 
   effects: {
-    *create({ payload }, { call, put }) {
+    *create1({ payload }, { call, put }) {
       yield put({
         type: 'execute',
-        method: 'SHOW_FORM',
+        method: 'CREATE',
         payload,
       });
     },
@@ -21,16 +20,15 @@ export default {
       const response = yield call(fakeSubmitForm, payload);
       console.log(response);
       if (response.code === 200) {
-        message.success('提交成功');
         yield put({
           type: 'execute',
-          method: 'SHOW_PAGE',
+          method: 'CREATE_SUCCESS',
           payload,
         });
       } else {
         yield put({
           type: 'execute',
-          method: 'SHOW_ERROR',
+          method: 'CREATE_ERROR',
           payload,
         });
       }
@@ -53,25 +51,20 @@ export default {
   reducers: {
     execute(state, action) {
       switch (action.method) {
-        case 'SHOW_FORM':
+        case 'CREATE':
           return {
             ...state,
-            step: "SHOW_FORM",
+            step: "form",
           };
-        case 'SHOW_SUCCESS':
+        case 'CREATE_SUCCESS':
           return {
             ...state,
-            step: "SHOW_SUCCESS",
+            step: "success",
           };
-        case 'SHOW_ERROR':
+        case 'CREATE_ERROR':
           return {
             ...state,
-            step: "SHOW_ERROR",
-          };
-        case 'SHOW_PAGE':
-          return {
-            ...state,
-            step: "SHOW_PAGE",
+            step: "error",
           };
         default:
           return {
