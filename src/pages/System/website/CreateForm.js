@@ -158,10 +158,10 @@ class BasicForms extends PureComponent {
                   {...formItemLayout}
                   label={
                     <span>
-                      客户
+                      一级行业
                       <em className={styles.optional}>
                         （选填）
-                        <Tooltip title="目标的服务对象">
+                        <Tooltip title="一级行业信息">
                           <Icon type="info-circle-o" style={{ marginRight: 4 }} />
                         </Tooltip>
                       </em>
@@ -169,20 +169,20 @@ class BasicForms extends PureComponent {
                   }
                 >
                   {getFieldDecorator('client')(
-                    <Input placeholder="请描述你服务的客户，内部客户直接 @姓名／工号" />
+                    <Input placeholder="一级行业信息" />
                   )}
                 </FormItem>
                 <FormItem
                   {...formItemLayout}
                   label={
                     <span>
-                      邀评人
+                      二级行业
                       <em className={styles.optional}>（选填）</em>
                     </span>
                   }
                 >
                   {getFieldDecorator('invites')(
-                    <Input placeholder="请直接 @姓名／工号，最多可邀请 5 人" />
+                    <Input placeholder="二级行业" />
                   )}
                 </FormItem>
                 <FormItem

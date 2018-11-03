@@ -128,25 +128,25 @@ class EditForm extends PureComponent {
     return (
 
       <PageHeaderWrapper
-        title="基础表单"
+        title="编辑商户"
         content="表单页用于向用户收集或验证信息，基础表单常见于数据项较少的表单场景。"
       >
         <Card bordered={false}>
           <Form onSubmit={this.handleSubmit} hideRequiredMark style={{ marginTop: 8 }}>
-            <FormItem {...formItemLayout} label="标题">
+            <FormItem {...formItemLayout} label="商户名">
               {getFieldDecorator('merchantName', {
                 initialValue: formVals.merchantName,
                 rules: [
                   {
                     required: true,
-                    message: '请输入标题',
+                    message: '请输入商户名',
                   },
                 ],
               })(<Input placeholder="给目标起个名字" />)}
             </FormItem>
             <FormItem {...formItemLayout} label="起止日期">
               {getFieldDecorator('updatedAt', {
-                initialValue: [moment(formVals.updatedAt, dateFormat), moment('2015/01/01', dateFormat)],
+                initialValue: [moment(formVals.start, dateFormat), moment(formVals.end, dateFormat)],
                 rules: [
                   {
                     required: true,
@@ -155,62 +155,59 @@ class EditForm extends PureComponent {
                 ],
               })(<RangePicker style={{ width: '100%' }} placeholder={['开始日期', '结束日期']} />)}
             </FormItem>
-            <FormItem {...formItemLayout} label="目标描述">
-              {getFieldDecorator('goal', {
+            <FormItem {...formItemLayout} label="描述">
+              {getFieldDecorator('desc', {
+                initialValue: formVals.desc,
                 rules: [
                   {
                     required: true,
-                    message: '请输入目标描述',
+                    message: '请输入描述',
                   },
                 ],
               })(
                 <TextArea
                   style={{ minHeight: 32 }}
-                  placeholder="请输入你的阶段性工作目标"
+                  placeholder="请输入描述"
                   rows={4}
                 />
               )}
-            </FormItem>
-            <FormItem {...formItemLayout} label="衡量标准">
-              {getFieldDecorator('standard', {
-                rules: [
-                  {
-                    required: true,
-                    message: '请输入衡量标准',
-                  },
-                ],
-              })(<TextArea style={{ minHeight: 32 }} placeholder="请输入衡量标准" rows={4} />)}
             </FormItem>
             <FormItem
               {...formItemLayout}
               label={
                 <span>
-                  客户
+                  一级分类
                   <em className={styles.optional}>
                     （选填）
-                    <Tooltip title="目标的服务对象">
+                    <Tooltip title="一级分类">
                       <Icon type="info-circle-o" style={{ marginRight: 4 }} />
                     </Tooltip>
                   </em>
                 </span>
               }
             >
-              {getFieldDecorator('client')(
-                <Input placeholder="请描述你服务的客户，内部客户直接 @姓名／工号" />
-              )}
+              {getFieldDecorator('industry1',
+                {
+                  initialValue: formVals.industry1,
+                })(
+                  < Input placeholder="一级分类" />
+                )}
             </FormItem>
             <FormItem
               {...formItemLayout}
               label={
                 <span>
-                  邀评人
+                  二级分类
                   <em className={styles.optional}>（选填）</em>
                 </span>
               }
             >
-              {getFieldDecorator('invites')(
-                <Input placeholder="请直接 @姓名／工号，最多可邀请 5 人" />
-              )}
+              {getFieldDecorator('industry2',
+                {
+                  initialValue: formVals.industry2,
+                })(
+                  <Input placeholder="二级分类" />
+                )}
             </FormItem>
             <FormItem
               {...formItemLayout}
@@ -221,13 +218,14 @@ class EditForm extends PureComponent {
                 </span>
               }
             >
-              {getFieldDecorator('weight')(<InputNumber placeholder="请输入" min={0} max={100} />)}
+              {getFieldDecorator('weight', { initialValue: formVals.weight, })(<InputNumber placeholder="请输入" min={0} max={100} />)}
               <span className="ant-form-text">%</span>
             </FormItem>
+
             <FormItem {...formItemLayout} label="目标公开" help="客户、邀评人默认被分享">
               <div>
                 {getFieldDecorator('public', {
-                  initialValue: '1',
+                  initialValue: formVals.public,
                 })(
                   <Radio.Group>
                     <Radio value="1">公开</Radio>
@@ -245,7 +243,7 @@ class EditForm extends PureComponent {
                         display: getFieldValue('public') === '2' ? 'block' : 'none',
                       }}
                     >
-                      <Option value="1">同事甲</Option>
+                      <Option value="1" >同事甲</Option>
                       <Option value="2">同事乙</Option>
                       <Option value="3">同事丙</Option>
                     </Select>
@@ -261,7 +259,7 @@ class EditForm extends PureComponent {
             </FormItem>
           </Form>
         </Card>
-      </PageHeaderWrapper>
+      </PageHeaderWrapper >
     );
   }
 }

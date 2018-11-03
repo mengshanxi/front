@@ -391,8 +391,12 @@ class Website extends PureComponent {
       dataIndex: 'merchantName',
     },
     {
-      title: '描述',
-      dataIndex: 'desc',
+      title: '域名',
+      dataIndex: 'domainName',
+    },
+    {
+      title: '网站名',
+      dataIndex: 'websiteName',
     },
     {
       title: '一级分类',
@@ -402,6 +406,7 @@ class Website extends PureComponent {
       title: '二级分类',
       dataIndex: 'industry2',
     },
+
     {
       title: '重要度',
       dataIndex: 'attention',

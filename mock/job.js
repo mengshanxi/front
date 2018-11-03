@@ -7,11 +7,14 @@ for (let i = 0; i < 46; i += 1) {
     key: i,
     disabled: i % 6 === 0,
     merchantName: `公司${i}`,
-    domainName: `域名 ${i}`,
-    websiteName: `网站名 ${i}`,
+    desc: `描述${i}`,
     industry1: `一级分类 ${i}`,
     industry2: `二级分类 ${i}`,
-    attention: i / 2,
+    public: "2",
+    attention: i % 2,
+    weight: i,
+    start: new Date(`2017-06-${Math.floor(i / 2) + 1}`),
+    end: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     updatedAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     createdAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
   });
@@ -41,12 +44,12 @@ function getJob(req, res, u) {
     });
   }
 
-  if (params.version) {
-    const version = params.version.split(',');
+  if (params.attention) {
+    const attention = params.attention.split(',');
     let filterDataSource = [];
     version.forEach(s => {
       filterDataSource = filterDataSource.concat(
-        dataSource.filter(data => parseInt(data.version, 10) === parseInt(s[0], 10))
+        dataSource.filter(data => parseInt(data.attention, 10) === parseInt(s[0], 10))
       );
     });
     dataSource = filterDataSource;
@@ -93,19 +96,19 @@ function getWebsite(req, res, u) {
     });
   }
 
-  if (params.version) {
-    const version = params.version.split(',');
+  if (params.attention) {
+    const attention = params.attention.split(',');
     let filterDataSource = [];
-    version.forEach(s => {
+    attention.forEach(s => {
       filterDataSource = filterDataSource.concat(
-        dataSource.filter(data => parseInt(data.version, 10) === parseInt(s[0], 10))
+        dataSource.filter(data => parseInt(data.attention, 10) === parseInt(s[0], 10))
       );
     });
     dataSource = filterDataSource;
   }
 
-  if (params.ipAddress) {
-    dataSource = dataSource.filter(data => data.ipAddress.indexOf(params.ipAddress) > -1);
+  if (params.merchantName) {
+    dataSource = dataSource.filter(data => data.merchantName.indexOf(params.merchantName) > -1);
   }
 
   let pageSize = 10;
